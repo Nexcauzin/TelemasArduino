@@ -14,6 +14,12 @@ int readingsPitot1[numReadingsPitot]; // Vetor que armazena as amostras do Pitot
 int readingsPitot2[numReadingsPitot]; // Vetor que armazena as amostras do Pitot2
 int readIndex = 0; // Variável que vai iterar o vetor e apontar para o novo valor
 
+// ================= VARIÁVEIS PARA A LEITURA DOS SERVOS
+#define canalProfundor 2
+#define canalSV 3
+#define canalAileron 4
+int pwmProfundor, pwmSV, pwmAileron;
+
 
 // =========== FUNÇÕES PARA EXECUÇÃO DO LOOP ===============
 // ==================== PARA O PITOT =======================
@@ -80,12 +86,22 @@ float mediaPitot2(float leitPitot2){
   return soma/numReadingsPitot; // Retorno da média
 }
 
+// ========= PARA A DEFLEXÃO DOS SERVOS =============
+int servosPWM(int canal){
+  int leitura = pulseIn(canal, HIGH, 25000);
+  return leitura;
+}
+
 
 // ====================== SETUP =======================
 void setup() {
   Serial.begin(9600);
   offset1 = Calibracao(Pitot1);
   offset2 = Calibracao(Pitot2);
+
+  pinMode(canalProfundor, INPUT);
+  pinMode(canalSV, INPUT);
+  pinMode(canalAileron, INPUT);
 }
 
 // Função de calibração do Pitot
@@ -110,6 +126,12 @@ void loop() {
   // Convertendo os valores para string
   String VELOCIDADE1 = String(velocPitot1);
   String VELOCIDADE2 = String(velocPitot2);
+
+
+  // =========== Deflexão dos servos (PWM)
+  pwmProfundor = servosPWM(canalProfundor);
+  pwmSV = servosPWM(canalSV);
+  pwmAileron = servosPWM(canalAileron);
 
   // Fazendo o print em 1 linha com o delimitador do algoritmo da aquisição
   Serial.print(VELOCIDADE1);
